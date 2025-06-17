@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Iniciar sesión en Scoreflex - Sistema de gestión de calificaciones">
+    <title>Iniciar Sesión - Scoreflex</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='img/logo.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f2f5; /* Un color de fondo suave */
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        .navbar-custom-brand {
+            color: #0B3750; /* Color de la navbar para el brand */
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .btn-primary-custom {
+            background-color: #1C9FC5;
+            border-color: #1C9FC5;
+        }
+        .btn-primary-custom:hover {
+            background-color: #157ea0;
+            border-color: #157ea0;
+        }
+        .btn-google {
+            background-color: #DB4437;
+            color: white;
+            border: none;
+        }
+        .btn-google:hover {
+            background-color: #c23327;
+            color: white;
+        }
+        .highlight-text {
+            color: #BAC618;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <img src="{{ url_for('static', path='img/logo.png') }}" alt="Scoreflex Logo" style="width: 150px; height: auto;">
+        </div>
+        <h2 class="text-center mb-4">Bienvenido a Scoreflex</h2>
+        <h4 class="text-center mb-4">Iniciar Sesión</h4>
+
+        {% if message %}
+        <div class="alert alert-danger" role="alert" id="loginAlertMessage">
+            {{ message }}
+        </div>
+        {% endif %}
+        <div class="alert alert-danger d-none" role="alert" id="loginFailedAlert">
+            Error al iniciar sesión. Verifica tus credenciales.
+        </div>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                <label class="form-check-label" for="rememberMe">Acuérdate de mí</label>
+            </div>
+            <button type="submit" class="btn btn-primary-custom w-100">
+                Ingresar <i class="bi bi-arrow-right-circle ms-2"></i>
+            </button>
+        </form>
+        <hr class="my-4">
+    <!-- Comentado mientras no esté implementado -->
+    <!-- 
+    <button class="btn btn-google w-100 mb-2" type="button" id="googleLoginBtn">
+        <i class="bi bi-google me-2"></i> Iniciar sesión con Google
+    </button>
+    -->
+        <div class="text-center mt-3">
+            <small><a href="/register">¿No tienes cuenta? Regístrate</a></small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const alertElement = document.getElementById('loginFailedAlert'); // Usar el ID correcto del div de alerta
+            
+            const formData = new FormData(this); // 'this' se refiere al formulario
+            // OAuth2PasswordRequestForm espera 'username' y 'password'
+            // así que renombramos 'email' a 'username' para el FormData si es necesario
+            // o nos aseguramos que el input name sea 'username'.
+            // Por ahora, asumimos que el input de email tiene name="username"
+            // o lo ajustamos aquí:
+            const body = new URLSearchParams();
+            body.append('username', formData.get('email')); // El input de email tiene name="email"
+            body.append('password', formData.get('password'));
+
+            try {
+                // Guardar email en localStorage si se marcó "Acuérdate de mí"
+                const rememberMe = document.getElementById('rememberMe').checked;
+                const userEmail = formData.get('email');
+                saveToLocalStorage(userEmail, rememberMe);
+                
+                const response = await fetch('/api/auth/token', { // Nuevo endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: body.toString(),
+                });
+
+                if (response.ok) {
+                    const data = await response.json(); // Contiene access_token, token_type, is_admin
+                    
+                    // La SessionMiddleware en main.py ya habrá establecido la cookie de sesión HTTP-only.
+                    // El frontend puede usar data.is_admin si necesita tomar decisiones inmediatas,
+                    // pero la verdadera autoridad sobre el estado de admin residirá en la sesión del backend.
+                    
+                    if (data.access_token && data.redirect_url) {
+                        console.log('Login successful. Token received. Admin status:', data.is_admin);
+                        console.log('Attempting to redirect to:', data.redirect_url);
+                        window.location.href = data.redirect_url; // Use the redirect_url from the response
+                    } else {
+                        // This case should ideally not be reached if the API always returns redirect_url on success
+                        // or a proper error structure on failure.
+                        alertElement.textContent = data.detail || 'Respuesta inesperada del servidor.';
+                        alertElement.classList.remove('d-none');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    alertElement.textContent = errorData.detail || 'Error de autenticación.';
+                    alertElement.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error('Error en login:', error);
+                alertElement.textContent = 'Error de conexión o del servidor.';
+                alertElement.classList.remove('d-none');
+            }
+        });
+
+        // Funcionalidad de "Acuérdate de mí"
+        function saveToLocalStorage(email, remember) {
+            if (remember) {
+                localStorage.setItem('rememberedEmail', email);
+            } else {
+                localStorage.removeItem('rememberedEmail');
+            }
+        }
+
+        // Cargar email guardado al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            if (rememberedEmail) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+
+        // Botón Google Login ha sido comentado en el HTML
+        // document.getElementById('googleLoginBtn').addEventListener('click', function() {
+        //    alert('Inicio de sesión con Google (no implementado).');
+        // });
+    </script>
+</body>
+</html>

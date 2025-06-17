@@ -1,0 +1,67 @@
+{
+  "maustisan@gmail.com": {
+    "nombre": "gustavo",
+    "email": "maustisan@gmail.com",
+    "password": "qwer25",
+    "is_admin": false,
+    "tipo_documento": "cc",
+    "numero_documento": "14141144",
+    "fecha_nacimiento": "1999-12-12",
+    "pais_origen": "CO",
+    "categoria": "Futbol",
+    "foto_perfil": null,
+    "tipo_usuario": "Atleta"
+  },
+  "estiven9512@gmail.com": {
+    "nombre": "Rogelio Gómez Arma",
+    "email": "estiven9512@gmail.com",
+    "password": "qwe123",
+    "is_admin": false,
+    "tipo_documento": "cc",
+    "numero_documento": "14141144",
+    "fecha_nacimiento": "1990-05-25",
+    "pais_origen": "AR",
+    "categoria": "Futbol",
+    "foto_perfil": null,
+    "tipo_usuario": "Jugador"
+  },
+  "gust@gmail.com": {
+    "nombre": "gustavo",
+    "email": "gust@gmail.com",
+    "password": "asd147",
+    "is_admin": false,
+    "tipo_documento": "cc",
+    "numero_documento": "12345678",
+    "fecha_nacimiento": "2000-12-12",
+    "pais_origen": "MX",
+    "categoria": "Atletismo",
+    "foto_perfil": null,
+    "tipo_usuario": "Atleta"
+  },
+  "juz@gmail.com": {
+    "nombre": "Juz",
+    "email": "juz@gmail.com",
+    "password": "qwe123",
+    "is_admin": false,
+    "tipo_documento": "cc",
+    "numero_documento": "14253612",
+    "fecha_nacimiento": "2001-12-12",
+    "pais_origen": "ES",
+    "categoria": "Atletismo",
+    "foto_perfil": null,
+    "tipo_usuario": "Juez"
+  },
+  "fau@gmail.com": {
+    "nombre": "faustina",
+    "email": "fau@gmail.com",
+    "password": "qwe123",
+    "is_admin": false,
+    "tipo_documento": "ti",
+    "numero_documento": "14789325",
+    "fecha_nacimiento": "1980-06-14",
+    "pais_origen": "CO",
+    "categoria": "Futbol",
+    "foto_perfil": null,
+    "tipo_usuario": null
+  }
+}

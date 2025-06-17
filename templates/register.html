@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario - Scoreflex</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='img/logo.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-custom {
+            background-color: #0B3750;
+        }
+        .btn-primary-custom {
+            background-color: #1C9FC5;
+            border-color: #1C9FC5;
+        }
+        .btn-primary-custom:hover {
+            background-color: #157ea0;
+            border-color: #157ea0;
+        }
+        .highlight-text {
+            color: #BAC618;
+            font-weight: bold;
+        }
+        .left-panel {
+            background-color: #0B3750;
+            color: white;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        .left-panel h2 {
+            color: #BAC618;
+        }
+        .form-panel {
+            padding: 40px;
+            background-color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid gx-0">
+        <div class="row gx-0">
+            <div class="col-md-5 left-panel d-none d-md-flex flex-column justify-content-center">
+                <div class="text-center mb-4">
+                    <a href="{{ url_for('serve_landing_page') }}">
+                        <img src="{{ url_for('static', path='img/logo.png') }}" alt="Scoreflex Logo" style="width: 100px; height: auto;">
+                    </a>
+                </div>
+                <h2>Bienvenido a <span class="highlight-text">ScoreFlex</span></h2>
+                <p class="lead mt-3">Únete a nuestra comunidad y gestiona tus actividades de forma eficiente.</p>
+                <hr class="my-4" style="border-color: #BAC618;">
+                <p>Al registrarte, aceptas nuestros <a href="#" class="highlight-text text-decoration-none">Términos de Servicio</a> y <a href="#" class="highlight-text text-decoration-none">Política de Privacidad</a>.</p>
+                <p>Disfruta de una experiencia personalizada y segura.</p>
+            </div>
+            <div class="col-md-7 form-panel">
+                <h3 class="mb-4 text-center">Crear Cuenta</h3>
+                
+                {% if message %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                <form id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="userType" class="form-label">Tipo de Usuario</label>
+                            <select class="form-select" id="userType" name="userType" required>
+                                <option value="" selected disabled>Seleccionar...</option>
+                                <option value="atleta">Atleta</option>
+                                <option value="entrenador">Entrenador</option>
+                                <option value="delegado">Delegado</option>
+                                <option value="juez">Juez</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="names" class="form-label">Nombres Completos</label>
+                            <input type="text" class="form-control" id="names" name="nombre" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="docType" class="form-label">Tipo de Documento</label>
+                            <select class="form-select" id="docType" name="docType" required>
+                                <option value="" selected disabled>Seleccionar...</option>
+                                <option value="cc">Cédula de Ciudadanía</option>
+                                <option value="ti">Tarjeta de Identidad</option>
+                                <option value="ce">Cédula de Extranjería</option>
+                                <option value="passport">Pasaporte</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="docNumber" class="form-label">Número de Documento</label>
+                            <input type="text" class="form-control" id="docNumber" name="docNumber" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="birthday" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="birthday" name="birthday" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+
+                    <!-- Password fields moved after Categoria/Deporte Principal -->
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="country" class="form-label">País</label>
+                            <select class="form-select" id="country" name="country" required>
+                                <option value="" selected disabled>Seleccionar...</option>
+                                <option value="CO">Colombia</option>
+                                <option value="MX">México</option>
+                                <option value="AR">Argentina</option>
+                                <option value="ES">España</option>
+                                <!-- Agrega más países según sea necesario -->
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">Categoría/Deporte Principal</label>
+                            <input type="text" class="form-control" id="category" name="category" placeholder="Ej: Fútbol, Atletismo Sub-18">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">Foto de Perfil (opcional)</label>
+                        <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">
+                        Registrarse <i class="bi bi-arrow-right-circle ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container">
+        <div id="registerToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ¡Registro exitoso!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+         <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="errorToastBody">
+                    Error en el registro.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirm_password');
+
+            if (password !== confirmPassword) {
+                const errorToastBody = document.getElementById('errorToastBody');
+                errorToastBody.textContent = 'Las contraseñas no coinciden.';
+                const toastEl = document.getElementById('errorToast');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+                return; // Detener el envío del formulario
+            }
+
+            const data = {
+                nombre: formData.get('nombre'), // El API espera 'nombre'
+                email: formData.get('email'),
+                password: password,
+                tipo_documento: formData.get('docType'),
+                numero_documento: formData.get('docNumber'),
+                fecha_nacimiento: formData.get('birthday'),
+                pais_origen: formData.get('country'),
+                categoria: formData.get('category')
+                // foto_perfil se añade condicionalmente abajo
+            };
+            
+            const photoFile = formData.get('photo');
+            if (photoFile && photoFile.size > 0) {
+                data.foto_perfil = photoFile.name; // Envía solo el nombre del archivo por ahora
+            } else {
+                data.foto_perfil = null;
+            }
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const toastEl = document.getElementById('registerToast');
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+                    setTimeout(() => {
+                        window.location.href = '/home'; // Redirigir a la página de inicio
+                    }, 2000); // Esperar 2 segundos antes de redirigir
+                } else {
+                    const errorToastBody = document.getElementById('errorToastBody');
+                    errorToastBody.textContent = result.detail || 'Error en el registro.';
+                    const toastEl = document.getElementById('errorToast');
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const errorToastBody = document.getElementById('errorToastBody');
+                errorToastBody.textContent = 'Error de conexión o del servidor.';
+                const toastEl = document.getElementById('errorToast');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - ScoreFlex</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='img/logo.png') }}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .navbar-custom {
+            background-color: #0B3750; /* Azul oscuro ScoreFlex */
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #ffffff;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #BAC618; /* Amarillo verdoso ScoreFlex */
+        }
+        .btn-primary-scoreflex {
+            background-color: #1C9FC5; /* Azul claro ScoreFlex */
+            border-color: #1C9FC5;
+            color: #ffffff;
+        }
+        .btn-primary-scoreflex:hover {
+            background-color: #157fa0;
+            border-color: #157fa0;
+        }
+        .btn-logout {
+            background-color: #dc3545; /* Rojo para logout */
+            border-color: #dc3545;
+        }
+        .btn-logout:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        .user-list-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('serve_home_page') }}">
+                <img src="{{ url_for('static', path='img/logo.png') }}" alt="ScoreFlex Logo" height="30" class="d-inline-block align-text-top me-2">
+                ScoreFlex
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('serve_logout_page') }}">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">Bienvenido a ScoreFlex, {{ user_email if user_email else 'Usuario' }}!</h1>
+                <p class="col-md-8 fs-4">Gestiona tus eventos y participantes de forma eficiente.</p>
+                {% if message %}
+                    <div class="alert alert-info mt-3" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if is_admin %}
+        <div class="user-list-container">
+            <h2><i class="bi bi-people-fill"></i> Usuarios Registrados</h2>
+            {% if users %}
+                <div class="table-responsive mt-4">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Nombre Completo</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Tipo Usuario</th>
+                                <th scope="col">País</th>
+                                <th scope="col">Categoría</th>
+                                <th scope="col">Admin</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.nombre }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.tipo_usuario if user.tipo_usuario else 'No especificado' }}</td>
+                                <td>{{ user.pais_origen if user.pais_origen else 'No especificado' }}</td>
+                                <td>{{ user.categoria if user.categoria else 'No especificado' }}</td>
+                                <td><span class="badge {{ 'bg-success' if user.is_admin else 'bg-secondary' }}">{{ 'Sí' if user.is_admin else 'No' }}</span></td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm me-1 edit-user-btn"
+                                            data-bs-toggle="modal" data-bs-target="#editUserModal"
+                                            data-email="{{ user.email }}"
+                                            data-nombre="{{ user.nombre }}"
+                                            data-tipo-documento="{{ user.tipo_documento | default('', true) }}"
+                                            data-numero-documento="{{ user.numero_documento | default('', true) }}"
+                                            data-fecha-nacimiento="{{ user.fecha_nacimiento | string | default('', true) }}"
+                                            data-pais-origen="{{ user.pais_origen | default('', true) }}"
+                                            data-categoria="{{ user.categoria | default('', true) }}"
+                                            data-foto-perfil="{{ user.foto_perfil | default('', true) }}"
+                                            data-is-admin="{{ 'true' if user.is_admin else 'false' }}">
+                                        <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Editar</span>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-user-btn"
+                                            data-email="{{ user.email }}"
+                                            data-nombre="{{ user.nombre }}">
+                                        <i class="bi bi-trash-fill"></i> <span class="d-none d-md-inline">Eliminar</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mt-3">No hay usuarios registrados para mostrar o no tienes permiso para verlos.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserEmailHidden">
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email (No editable)</label>
+                            <input type="email" class="form-control" id="editEmail" readonly>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editNombre" class="form-label">Nombre Completo</label>
+                                <input type="text" class="form-control" id="editNombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editTipoDocumento" class="form-label">Tipo Documento</label>
+                                <input type="text" class="form-control" id="editTipoDocumento">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editNumeroDocumento" class="form-label">Número Documento</label>
+                                <input type="text" class="form-control" id="editNumeroDocumento">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editFechaNacimiento" class="form-label">Fecha Nacimiento</label>
+                                <input type="date" class="form-control" id="editFechaNacimiento">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editPaisOrigen" class="form-label">País Origen</label>
+                                <input type="text" class="form-control" id="editPaisOrigen">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editCategoria" class="form-label">Categoría</label>
+                                <input type="text" class="form-control" id="editCategoria">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFotoPerfil" class="form-label">URL Foto Perfil (Opcional)</label>
+                            <input type="url" class="form-control" id="editFotoPerfil">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="editIsAdmin">
+                            <label class="form-check-label" for="editIsAdmin">Es Administrador</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary-scoreflex" id="saveUserChangesBtn">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container for notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">Notificación</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            const liveToast = new bootstrap.Toast(document.getElementById('liveToast'));
+
+            function showToast(title, message, isError = false) {
+                const toastTitleEl = document.getElementById('toastTitle');
+                const toastBodyEl = document.getElementById('toastBody');
+                const toastHeader = document.querySelector('#liveToast .toast-header');
+                
+                toastTitleEl.textContent = title;
+                toastBodyEl.textContent = message;
+                
+                if (isError) {
+                    toastHeader.classList.remove('bg-success', 'text-white');
+                    toastHeader.classList.add('bg-danger', 'text-white');
+                } else {
+                    toastHeader.classList.remove('bg-danger', 'text-white');
+                    toastHeader.classList.add('bg-success', 'text-white');
+                }
+                liveToast.show();
+            }
+
+            // Edit User Logic
+            document.querySelectorAll('.edit-user-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    document.getElementById('editEmail').value = this.dataset.email;
+                    document.getElementById('editUserEmailHidden').value = this.dataset.email; // Store email for submission
+                    document.getElementById('editNombre').value = this.dataset.nombre;
+                    document.getElementById('editTipoDocumento').value = this.dataset.tipoDocumento;
+                    document.getElementById('editNumeroDocumento').value = this.dataset.numeroDocumento;
+                    document.getElementById('editFechaNacimiento').value = this.dataset.fechaNacimiento;
+                    document.getElementById('editPaisOrigen').value = this.dataset.paisOrigen;
+                    document.getElementById('editCategoria').value = this.dataset.categoria;
+                    document.getElementById('editFotoPerfil').value = this.dataset.fotoPerfil;
+                    document.getElementById('editIsAdmin').checked = (this.dataset.isAdmin === 'true');
+                    editUserModal.show();
+                });
+            });
+
+            document.getElementById('saveUserChangesBtn').addEventListener('click', async function () {
+                const email = document.getElementById('editUserEmailHidden').value;
+                const updatedUserData = {
+                    email: email, // Email is the identifier
+                    nombre: document.getElementById('editNombre').value,
+                    tipo_documento: document.getElementById('editTipoDocumento').value || null,
+                    numero_documento: document.getElementById('editNumeroDocumento').value || null,
+                    fecha_nacimiento: document.getElementById('editFechaNacimiento').value || null,
+                    pais_origen: document.getElementById('editPaisOrigen').value || null,
+                    categoria: document.getElementById('editCategoria').value || null,
+                    foto_perfil: document.getElementById('editFotoPerfil').value || null,
+                    is_admin: document.getElementById('editIsAdmin').checked
+                };
+
+                // Filter out null values for fields that should not be sent if empty, unless API handles them
+                // For now, sending them as null or empty string as per Pydantic model Optional fields
+
+                try {
+                    const response = await fetch(`/api/users`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(updatedUserData)
+                    });
+
+                    if (response.ok) {
+                        showToast('Éxito', 'Usuario actualizado correctamente.');
+                        editUserModal.hide();
+                        // Optionally, refresh the page or update the table row dynamically
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        const errorData = await response.json();
+                        showToast('Error', `Error al actualizar: ${errorData.detail || response.statusText}`, true);
+                    }
+                } catch (error) {
+                    showToast('Error', `Error de red: ${error.message}`, true);
+                }
+            });
+
+            // Delete User Logic
+            document.querySelectorAll('.delete-user-btn').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userEmail = this.dataset.email;
+                    const userName = this.dataset.nombre;
+
+                    if (confirm(`¿Estás seguro de que quieres eliminar al usuario ${userName} (${userEmail})?`)) {
+                        try {
+                            const response = await fetch(`/api/users/${userEmail}`, {
+                                method: 'DELETE'
+                            });
+
+                            if (response.ok) {
+                                showToast('Éxito', `Usuario ${userName} eliminado correctamente.`);
+                                // Optionally, remove the row from the table or refresh
+                                setTimeout(() => window.location.reload(), 1500);
+                            } else {
+                                const errorData = await response.json();
+                                showToast('Error', `Error al eliminar: ${errorData.detail || response.statusText}`, true);
+                            }
+                        } catch (error) {
+                            showToast('Error', `Error de red: ${error.message}`, true);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

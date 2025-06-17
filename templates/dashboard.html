@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ScoreFlex</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='img/logo.png') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar-scoreflex {
+            background-color: #0B3750; /* Dark blue from register page */
+        }
+        .navbar-scoreflex .navbar-brand img {
+            max-height: 40px;
+        }
+        .navbar-scoreflex .nav-link {
+            color: rgba(255,255,255,.75);
+        }
+        .navbar-scoreflex .nav-link:hover, .navbar-scoreflex .nav-link.active {
+            color: #fff;
+        }
+        .event-card {
+            margin-bottom: 1.5rem;
+            border: 1px solid #e0e0e0;
+            transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .event-card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .event-card .card-body {
+            padding: 1rem;
+        }
+        .event-card .card-category {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        .event-card .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .event-card .card-organizer, .event-card .card-date {
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        .btn-load-more {
+            background-color: #1C9FC5; /* Teal from register page */
+            border-color: #1C9FC5;
+            color: white;
+        }
+        .btn-load-more:hover {
+            background-color: #167c9a;
+            border-color: #167c9a;
+            color: white;
+        }
+        .footer-scoreflex {
+            background-color: #0B3750; /* Dark blue */
+            color: rgba(255,255,255,0.7);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        .footer-scoreflex h5 {
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        .footer-scoreflex a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+        }
+        .footer-scoreflex a:hover {
+            color: #fff;
+        }
+        .footer-scoreflex .trophy-icon {
+            font-size: 3rem;
+            color: #BAC618; /* Highlight color from register page */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-scoreflex navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', path='img/logo.png') }}" alt="ScoreFlex Logo">
+                ScoreFlex
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">ÚLTIMOS EVENTOS</a>
+                    </li>
+                    
+                    {% if is_admin %}
+                        <!-- Opciones de Administrador -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-gear-fill"></i> ADMINISTRACIÓN
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('serve_home_page') }}"><i class="bi bi-people-fill"></i> Gestión de Usuarios</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar-event-fill"></i> Gestión de Eventos</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-trophy-fill"></i> Gestión de Competencias</a></li>
+                            </ul>
+                        </li>
+                    {% elif tipo_usuario == "Juez" %}
+                        <!-- Opciones de Juez -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-flag-fill"></i> ÁREA DE JUEZ
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard-check-fill"></i> Calificaciones</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar-event"></i> Eventos Asignados</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-file-text-fill"></i> Reportes</a></li>
+                            </ul>
+                        </li>
+                    {% elif tipo_usuario == "Atleta" or tipo_usuario == "Jugador" %}
+                        <!-- Opciones de Atleta/Jugador -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-badge-fill"></i> MI PERFIL DEPORTIVO
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-trophy"></i> Mis Competencias</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-graph-up"></i> Mi Rendimiento</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar-check"></i> Inscripciones</a></li>
+                            </ul>
+                        </li>
+                    {% elif tipo_usuario == "Entrenador" %}
+                        <!-- Opciones de Entrenador -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-whistle-fill"></i> ENTRENAMIENTO
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-people"></i> Mis Atletas</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar3"></i> Calendario</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard-data"></i> Estadísticas</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">MUNDO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">COMPETENCIAS ACTIVAS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">CULTURA</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('serve_logout_page') }}"><i class="bi bi-box-arrow-right"></i> Salir</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% if message %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Últimos eventos</h1>
+            <div>
+                <span class="badge bg-primary">Usuario: {{ user_email }}</span>
+                {% if is_admin %}
+                <span class="badge bg-danger ms-2">Administrador</span>
+                {% endif %}
+            </div>
+        </div>
+        <p class="lead mb-4">
+            Bienvenido/a a la sección de eventos de Scoreflex, donde exploramos las tendencias más recientes en el deporte. Desde competiciones innovadoras hasta presentaciones de talentos emergentes, te ofrecemos una selección de historias y eventos que destacan la riqueza y diversidad del talento creativo y atlético local.
+        </p>
+
+        <div class="row">
+            <!-- Sample Event Card 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="https://placehold.co/600x400/0B3750/BAC618?text=Gimnasia" class="card-img-top" alt="Evento Gimnasia">
+                    <div class="card-body">
+                        <p class="card-category">GIMNASIA</p>
+                        <h5 class="card-title">Final Nacional de Gimnasia Artística</h5>
+                        <p class="card-organizer">Liga de Bogotá</p>
+                        <p class="card-date"><i class="bi bi-calendar-event"></i> 7 abril 2025</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Sample Event Card 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="https://placehold.co/600x400/1C9FC5/FFFFFF?text=Trampolín" class="card-img-top" alt="Evento Trampolín">
+                    <div class="card-body">
+                        <p class="card-category">TRAMPOLÍN</p>
+                        <h5 class="card-title">Copa Colombia de Trampolín 2025</h5>
+                        <p class="card-organizer">Fed. Colombiana de Gimnasia</p>
+                        <p class="card-date"><i class="bi bi-calendar-event"></i> 14 abril 2025</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Sample Event Card 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="https://placehold.co/600x400/BAC618/0B3750?text=Acrobacia" class="card-img-top" alt="Evento Acrobacia">
+                    <div class="card-body">
+                        <p class="card-category">ACROBACIA</p>
+                        <h5 class="card-title">Festival Urbano de Acrobacia Medellín</h5>
+                        <p class="card-organizer">Movimiento Libre</p>
+                        <p class="card-date"><i class="bi bi-calendar-event"></i> 20 abril 2025</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Sample Event Card 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="https://placehold.co/600x400/E83E8C/FFFFFF?text=Danza" class="card-img-top" alt="Evento Danza">
+                    <div class="card-body">
+                        <p class="card-category">DANZA URBANA</p>
+                        <h5 class="card-title">Torneo Nacional de Street Dance</h5>
+                        <p class="card-organizer">Colombia Baila</p>
+                        <p class="card-date"><i class="bi bi-calendar-event"></i> 26 abril 2025</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Sample Event Card 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="https://placehold.co/600x400/6f42c1/FFFFFF?text=Parkour" class="card-img-top" alt="Evento Parkour">
+                    <div class="card-body">
+                        <p class="card-category">ACROBACIA</p>
+                        <h5 class="card-title">Encuentro Nacional de Parkour y AcroYoga</h5>
+                        <p class="card-organizer">Acro Libre</p>
+                        <p class="card-date"><i class="bi bi-calendar-event"></i> 18 mayo 2025</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Sample Event Card 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="https://placehold.co/600x400/fd7e14/000000?text=Listón" class="card-img-top" alt="Evento Listón">
+                    <div class="card-body">
+                        <p class="card-category">ARTES CON LISTÓN</p>
+                        <h5 class="card-title">Gala Intercolegial Artística con listón</h5>
+                        <p class="card-organizer">Escuelas en Gimnastas Putumayo</p>
+                        <p class="card-date"><i class="bi bi-calendar-event"></i> 24 mayo 2025</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 mb-5">
+            <button class="btn btn-load-more btn-lg">Cargar más</button>
+        </div>
+    </div>
+
+    <footer class="footer-scoreflex">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Enlaces de Interés</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Autores</a></li>
+                        <li><a href="#">Archivo</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Términos de Uso</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0 text-center">
+                    <i class="bi bi-trophy-fill trophy-icon"></i>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <h5>Sede Medellín</h5>
+                    <p>
+                        Carrera 48 No. 7-151, El Poblado - Antioquia<br>
+                        Código Postal: 050022<br>
+                        <a href="mailto:contacto@scoreflex.com">contacto@scoreflex.com</a>
+                    </p>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.2);">
+            <p class="text-center mb-0">&copy; 2025 ScoreFlex. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

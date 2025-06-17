@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a ScoreFlex</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='img/logo.png') }}">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Un color de fondo suave */
+            color: #0B3750; /* Color principal de ScoreFlex */
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .logo-img {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        .btn-custom-primary {
+            background-color: #1C9FC5; /* Botón ScoreFlex */
+            border-color: #1C9FC5;
+            color: white;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+        }
+        .btn-custom-primary:hover {
+            background-color: #157a99;
+            border-color: #157a99;
+            color: white;
+        }
+        .btn-custom-secondary {
+            background-color: #BAC618; /* Highlight ScoreFlex */
+            border-color: #BAC618;
+            color: #0B3750;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+        }
+        .btn-custom-secondary:hover {
+            background-color: #9fa813;
+            border-color: #9fa813;
+            color: #0B3750;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', path='img/logo.png') }}" alt="ScoreFlex Logo" class="logo-img">
+        <h1>Bienvenido a ScoreFlex</h1>
+        <p class="lead mb-4">Tu plataforma para la gestión de eventos y puntuaciones deportivas.</p>
+        <div>
+            <a href="{{ url_for('serve_login_page') }}" class="btn btn-custom-primary">Iniciar Sesión</a>
+            <a href="{{ url_for('serve_register_page') }}" class="btn btn-custom-secondary">Registrarse</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
