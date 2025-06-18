@@ -5,14 +5,10 @@ from typing import Dict, Any
 from datetime import date
 from pathlib import Path
 
-# Configurar logger
 logger = logging.getLogger(__name__)
-
-# Determinar la ruta base del proyecto y la ruta del archivo users.json
 BASE_DIR = Path(__file__).resolve().parent.parent
 USERS_FILE = os.path.join(BASE_DIR, "users.json")
 
-# Eliminar el archivo users.json en el directorio core si existe
 CORE_USERS_FILE = os.path.join(Path(__file__).resolve().parent, "users.json")
 if os.path.exists(CORE_USERS_FILE) and CORE_USERS_FILE != USERS_FILE:
     try:
@@ -21,16 +17,13 @@ if os.path.exists(CORE_USERS_FILE) and CORE_USERS_FILE != USERS_FILE:
     except Exception as e:
         logger.error(f"Failed to remove duplicate users.json: {e}")
 
-# Log the actual path being used for users.json
 logger.info(f"Using users.json file at: {os.path.abspath(USERS_FILE)}")
 
 def load_users() -> Dict[str, Dict]:
     """Carga los usuarios desde users.json. Devuelve un diccionario vacío si el archivo no existe."""
     if not os.path.exists(USERS_FILE):
         logger.warning(f"El archivo de usuarios no existe en la ruta: {USERS_FILE}. Se creará uno nuevo.")
-        # Crear directorio si no existe
         os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
-        # Crear archivo vacío
         save_users({})
         return {}
     
@@ -41,7 +34,6 @@ def load_users() -> Dict[str, Dict]:
             return data
     except json.JSONDecodeError as e:
         logger.error(f"Error al decodificar JSON de usuarios: {e}")
-        # Hacer backup del archivo corrupto
         backup_file = f"{USERS_FILE}.bak"
         try:
             os.rename(USERS_FILE, backup_file)
@@ -57,10 +49,8 @@ def load_users() -> Dict[str, Dict]:
         return {}
 
 def json_date_serializer(obj: Any) -> str:
-    """JSON serializer for objects not serializable by default json code"""
     if isinstance(obj, date):
         return obj.isoformat()
-    # Añadir otros tipos si es necesario
     raise TypeError(f"Tipo no serializable: {type(obj).__name__}")
 
 def save_users(data: Dict[str, Dict]) -> bool:
@@ -71,15 +61,12 @@ def save_users(data: Dict[str, Dict]) -> bool:
         bool: True si la operación fue exitosa, False en caso contrario.
     """
     try:
-        # Crear directorio si no existe
         os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
         
-        # Primero escribimos a un archivo temporal para no corromper el original en caso de error
         temp_file = f"{USERS_FILE}.tmp"
         with open(temp_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False, default=json_date_serializer)
         
-        # Si todo va bien, reemplazamos el archivo original
         if os.path.exists(USERS_FILE):
             os.replace(temp_file, USERS_FILE)
         else:

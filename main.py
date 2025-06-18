@@ -210,13 +210,3 @@ async def serve_home_page(
 async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url=app.url_path_for("serve_login_page") + "?message=Has+cerrado+sesión+exitosamente", status_code=303)
-
-# Para ejecutar (asegúrate que main.py está en la raíz del proyecto):
-# pip install -r requirements.txt
-# uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# IMPORTANTE: Para producción, crea un archivo .env con estas variables:
-# SESSION_SECRET_KEY=tu_clave_secreta_muy_segura
-# ADMIN_USER_EMAIL=tu_email_admin
-# ADMIN_USER_PASSWORD=tu_password_admin_seguro
-# LOG_LEVEL=INFO

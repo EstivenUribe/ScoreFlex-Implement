@@ -122,8 +122,6 @@
                         </div>
                     </div>
 
-                    <!-- Password fields moved after Categoria/Deporte Principal -->
-
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="country" class="form-label">País</label>
@@ -138,7 +136,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="category" class="form-label">Categoría/Deporte Principal</label>
-                            <input type="text" class="form-control" id="category" name="category" placeholder="Ej: Fútbol, Atletismo Sub-18">
+                            <input type="text" class="form-control" id="category" name="category" placeholder="Ej: Gimnasia Artística, listón, danza urbana, etc">
                         </div>
                     </div>
 
@@ -153,10 +151,6 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="photo" class="form-label">Foto de Perfil (opcional)</label>
-                        <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
-                    </div>
 
                     <button type="submit" class="btn btn-primary-custom w-100 mt-3">
                         Registrarse <i class="bi bi-arrow-right-circle ms-2"></i>
@@ -202,7 +196,7 @@
                 const toastEl = document.getElementById('errorToast');
                 const toast = new bootstrap.Toast(toastEl);
                 toast.show();
-                return; // Detener el envío del formulario
+                return; 
             }
 
             const data = {
@@ -215,18 +209,16 @@
                 fecha_nacimiento: formData.get('birthday'),
                 pais_origen: formData.get('country'),
                 categoria: formData.get('category')
-                // foto_perfil se añade condicionalmente abajo
             };
             
             const photoFile = formData.get('photo');
             if (photoFile && photoFile.size > 0) {
-                data.foto_perfil = photoFile.name; // Envía solo el nombre del archivo por ahora
+                data.foto_perfil = photoFile.name; 
             } else {
                 data.foto_perfil = null;
             }
 
             try {
-                // Registramos el usuario con todos sus datos en un solo endpoint
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
@@ -246,8 +238,8 @@
                     const toast = new bootstrap.Toast(toastEl);
                     toast.show();
                     setTimeout(() => {
-                        window.location.href = '/home'; // Redirigir a la página de inicio
-                    }, 2000); // Esperar 2 segundos antes de redirigir
+                        window.location.href = '/home'; 
+                    }, 2000); 
                 } else {
                     const errorToastBody = document.getElementById('errorToastBody');
                     errorToastBody.textContent = result.detail || 'Error en el registro.';

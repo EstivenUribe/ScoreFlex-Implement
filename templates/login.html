@@ -14,7 +14,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: #f0f2f5; /* Un color de fondo suave */
+            background-color: #f0f2f5; 
         }
         .login-card {
             width: 100%;
@@ -26,7 +26,7 @@
             background-color: white;
         }
         .navbar-custom-brand {
-            color: #0B3750; /* Color de la navbar para el brand */
+            color: #0B3750; 
             font-weight: bold;
             font-size: 1.5rem;
         }
@@ -102,25 +102,19 @@
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-            const alertElement = document.getElementById('loginFailedAlert'); // Usar el ID correcto del div de alerta
+            const alertElement = document.getElementById('loginFailedAlert'); 
             
-            const formData = new FormData(this); // 'this' se refiere al formulario
-            // OAuth2PasswordRequestForm espera 'username' y 'password'
-            // así que renombramos 'email' a 'username' para el FormData si es necesario
-            // o nos aseguramos que el input name sea 'username'.
-            // Por ahora, asumimos que el input de email tiene name="username"
-            // o lo ajustamos aquí:
+            const formData = new FormData(this); 
             const body = new URLSearchParams();
-            body.append('username', formData.get('email')); // El input de email tiene name="email"
+            body.append('username', formData.get('email')); 
             body.append('password', formData.get('password'));
 
             try {
-                // Guardar email en localStorage si se marcó "Acuérdate de mí"
                 const rememberMe = document.getElementById('rememberMe').checked;
                 const userEmail = formData.get('email');
                 saveToLocalStorage(userEmail, rememberMe);
                 
-                const response = await fetch('/api/auth/token', { // Nuevo endpoint
+                const response = await fetch('/api/auth/token', { 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -129,19 +123,15 @@
                 });
 
                 if (response.ok) {
-                    const data = await response.json(); // Contiene access_token, token_type, is_admin
+                    const data = await response.json(); 
                     
-                    // La SessionMiddleware en main.py ya habrá establecido la cookie de sesión HTTP-only.
-                    // El frontend puede usar data.is_admin si necesita tomar decisiones inmediatas,
-                    // pero la verdadera autoridad sobre el estado de admin residirá en la sesión del backend.
+                    
                     
                     if (data.access_token && data.redirect_url) {
                         console.log('Login successful. Token received. Admin status:', data.is_admin);
                         console.log('Attempting to redirect to:', data.redirect_url);
-                        window.location.href = data.redirect_url; // Use the redirect_url from the response
+                        window.location.href = data.redirect_url; 
                     } else {
-                        // This case should ideally not be reached if the API always returns redirect_url on success
-                        // or a proper error structure on failure.
                         alertElement.textContent = data.detail || 'Respuesta inesperada del servidor.';
                         alertElement.classList.remove('d-none');
                     }
@@ -157,7 +147,6 @@
             }
         });
 
-        // Funcionalidad de "Acuérdate de mí"
         function saveToLocalStorage(email, remember) {
             if (remember) {
                 localStorage.setItem('rememberedEmail', email);
@@ -166,7 +155,6 @@
             }
         }
 
-        // Cargar email guardado al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             const rememberedEmail = localStorage.getItem('rememberedEmail');
             if (rememberedEmail) {
@@ -175,10 +163,6 @@
             }
         });
 
-        // Botón Google Login ha sido comentado en el HTML
-        // document.getElementById('googleLoginBtn').addEventListener('click', function() {
-        //    alert('Inicio de sesión con Google (no implementado).');
-        // });
     </script>
 </body>
 </html>
