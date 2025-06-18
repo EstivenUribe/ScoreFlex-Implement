@@ -6,10 +6,12 @@ from datetime import date
 # Ajusta la ruta de importación según la estructura de tu proyecto
 # Si 'core' está en el mismo nivel que 'api' y ambos son paquetes (tienen __init__.py)
 # o si ScoreFlex-Implement es la raíz del proyecto y está en PYTHONPATH:
-from core.core import Usuario as CoreUsuario, crear_gestor_full, GestorUsuarios
-# Si core.py está en un directorio 'core' al mismo nivel que el directorio 'api'
-# y ejecutas uvicorn desde el directorio padre de 'api' y 'core':
-# from ..core.core import Usuario as CoreUsuario, crear_gestor_full, GestorUsuarios
+from core.core import Usuario as CoreUsuario, GestorUsuarios
+import sys
+from pathlib import Path
+
+# Importar el gestor de usuarios global desde el módulo compartido
+from shared import user_manager
 
 
 # --- Pydantic Models ---
@@ -42,28 +44,31 @@ class UsuarioOut(UsuarioBase):
     class Config:
         from_attributes = True # Compatible con objetos ORM/dataclass como nuestro CoreUsuario
 
+# Lista de tipos de usuario permitidos
+TIPOS_USUARIO_PERMITIDOS = ["Atleta", "Entrenador", "Delegado", "Juez", "Otro"]
+
 class UsuarioUpdate(BaseModel):
     email: EmailStr = Field(..., description="Email del usuario a actualizar (identificador)")
-    nombre: Optional[str] = Field(None, min_length=1, example="Juan Carlos Pérez") # Corregido de nombre_completo
+    nombre: Optional[str] = Field(None, min_length=1, example="Juan Carlos Pérez")
     # Password no se incluye aquí; usualmente se maneja en un endpoint dedicado.
-    is_admin: Optional[bool] = Field(None, description="Nuevo estado de administrador")
+    # is_admin se ha eliminado para evitar cambios no autorizados en el estado de administrador
+    tipo_usuario: Optional[str] = Field(None, description="Tipo de usuario", example="Atleta")
     tipo_documento: Optional[str] = Field(None, example="Cédula de Ciudadanía")
     numero_documento: Optional[str] = Field(None, example="123456789")
     fecha_nacimiento: Optional[date] = Field(None, example="2000-01-01")
     pais_origen: Optional[str] = Field(None, example="Colombia")
-    categoria: Optional[str] = Field(None, example="Juez")
+    categoria: Optional[str] = Field(None, example="Futbol")
     foto_perfil: Optional[str] = Field(None, example="nombre_archivo_actualizado.jpg")
 
 
 # --- API Router ---
 router = APIRouter()
 
-# Crear instancia del gestor de usuarios
+# Usar la instancia global del gestor de usuarios
 # Asumimos que las operaciones de API son realizadas por un administrador
 # por lo que pasamos solicitante_admin=True a los métodos del gestor.
-# La factoría `crear_gestor_full` no toma `is_admin` como argumento,
-# el flag se pasa a cada método.
-gestor_usuarios: GestorUsuarios = crear_gestor_full()
+# El flag se pasa a cada método.
+gestor_usuarios = user_manager
 SOLICITANTE_ES_ADMIN = True # Flag para las llamadas al gestor
 
 # --- Helper para convertir CoreUsuario a UsuarioOut ---
@@ -203,6 +208,14 @@ async def actualizar_usuario_existente(usuario_update: UsuarioUpdate):
         if not usuario_actual:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado para actualizar.")
 
+        # Normalizar el tipo de usuario si se proporciona
+        tipo_usuario_normalizado = None
+        if usuario_update.tipo_usuario is not None:
+            tipo_usuario_normalizado = usuario_update.tipo_usuario.capitalize()
+            if tipo_usuario_normalizado not in TIPOS_USUARIO_PERMITIDOS:
+                print(f"WARNING: Tipo de usuario no válido: {tipo_usuario_normalizado}, manteniendo valor actual")
+                tipo_usuario_normalizado = usuario_actual.tipo_usuario
+        
         # Crear un objeto CoreUsuario con los datos actualizados
         # Si un campo no está en usuario_update, se usa el valor actual de usuario_actual
         # El password se toma del usuario_actual ya que no se modifica aquí.
@@ -210,7 +223,8 @@ async def actualizar_usuario_existente(usuario_update: UsuarioUpdate):
             email=usuario_actual.email, # Email no cambia, es el identificador
             password=usuario_actual.password, # Mantener la contraseña existente
             nombre=usuario_update.nombre if usuario_update.nombre is not None else usuario_actual.nombre,
-            is_admin=usuario_update.is_admin if usuario_update.is_admin is not None else usuario_actual.is_admin,
+            is_admin=usuario_actual.is_admin, # Mantener el estado de administrador actual, no se permite cambiar
+            tipo_usuario=tipo_usuario_normalizado if tipo_usuario_normalizado is not None else usuario_actual.tipo_usuario,
             tipo_documento=usuario_update.tipo_documento if usuario_update.tipo_documento is not None else usuario_actual.tipo_documento,
             numero_documento=usuario_update.numero_documento if usuario_update.numero_documento is not None else usuario_actual.numero_documento,
             fecha_nacimiento=usuario_update.fecha_nacimiento if usuario_update.fecha_nacimiento is not None else usuario_actual.fecha_nacimiento,

@@ -1,7 +1,0 @@
-{
-  "admin@example.com": {
-    "nombre": "Admin",
-    "email": "admin@example.com",
-    "is_admin": true
-  }
-}
