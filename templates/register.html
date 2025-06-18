@@ -206,9 +206,10 @@
             }
 
             const data = {
-                nombre: formData.get('nombre'), // El API espera 'nombre'
+                nombre: formData.get('nombre'),
                 email: formData.get('email'),
                 password: password,
+                tipo_usuario: formData.get('userType'),
                 tipo_documento: formData.get('docType'),
                 numero_documento: formData.get('docNumber'),
                 fecha_nacimiento: formData.get('birthday'),
@@ -225,12 +226,17 @@
             }
 
             try {
-                const response = await fetch('/api/users', {
+                // Registramos el usuario con todos sus datos en un solo endpoint
+                const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        email: data.email,
+                        password: data.password,
+                        tipo_usuario: data.tipo_usuario
+                    })
                 });
 
                 const result = await response.json();

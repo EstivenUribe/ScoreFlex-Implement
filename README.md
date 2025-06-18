@@ -209,11 +209,15 @@ ScoreFlex-Implement/
 
 ### Sistema de Roles de Usuario
 
-- **Roles Implementados**:
-  - **Administrador**: Acceso completo al sistema, incluida la gestión de usuarios, eventos y competencias.
-  - **Juez**: Puede calificar participantes, ver eventos asignados y generar reportes.
-  - **Atleta/Jugador**: Acceso a su perfil deportivo, competencias e inscripciones.
+- **Roles Implementados y Normalizados**:
+  - **Atleta**: Acceso a su perfil deportivo, competencias e inscripciones.
   - **Entrenador**: Gestión de atletas, calendarios y estadísticas.
+  - **Delegado**: Representación de equipos y gestión administrativa.
+  - **Juez**: Puede calificar participantes, ver eventos asignados y generar reportes.
+  - **Otro**: Rol genérico para otros tipos de usuarios del sistema.
+  - **Administrador**: Acceso completo al sistema (asignado internamente, no seleccionable durante registro).
+
+- **Validación de Roles**: El sistema valida y normaliza los tipos de usuario tanto en el registro como en la actualización, asegurando que solo se utilicen valores permitidos.
 
 - **Interfaz Adaptativa**: El dashboard muestra opciones de navegación personalizadas según el rol del usuario conectado.
 
@@ -232,6 +236,10 @@ ScoreFlex-Implement/
 - **Generación Dinámica de UI**: Templating con Jinja2 que adapta las vistas según los permisos y roles de usuario.
 
 - **Gestión de Concurrencia**: Implementación de `threading.Lock` para operaciones seguras con archivos en entornos multi-hilo.
+
+- **Flujo de Registro Optimizado**: Sistema de registro unificado que valida y normaliza los datos de usuario, asegurando consistencia en los tipos de usuario y evitando duplicidades.
+
+- **Gestión de Usuarios Mejorada**: Interfaz de administración que permite editar roles de usuario de forma segura, manteniendo la integridad del sistema de permisos.
 
 ### Consideraciones para Producción
 

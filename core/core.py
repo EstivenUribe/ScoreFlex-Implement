@@ -25,7 +25,7 @@ class Usuario:
     pais_origen: Optional[str] = None
     categoria: Optional[str] = None
     foto_perfil: Optional[str] = None
-    tipo_usuario: Optional[str] = None  # Juez, Atleta, Entrenador, etc.
+    tipo_usuario: str = "Atleta"  # Juez, Atleta, Entrenador, etc. - Por defecto es Atleta
 
 # 2. Definir la interfaz GestorUsuarios
 class GestorUsuarios(abc.ABC):
@@ -96,8 +96,14 @@ class GestorUsuariosBasico(GestorUsuarios):
             self._usuarios = processed_usuarios
 
     def _persist_users(self):
-        # This method assumes the lock is already acquired by the calling CUD method.
-        # It prepares the data for JSON serialization.
+        """Save users to the storage.
+        This is a helper method for internal use by the GestorUsuariosBasico class.
+        It prepares the data for JSON serialization."""
+        # Asegurarse de que todos los usuarios tengan un tipo_usuario antes de guardar
+        for user in self._usuarios.values():
+            if not user.tipo_usuario:
+                user.tipo_usuario = "Atleta"
+        
         users_to_save = {email: asdict(user) for email, user in self._usuarios.items()}
         save_users(users_to_save)
 

@@ -12,6 +12,18 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 USERS_FILE = os.path.join(BASE_DIR, "users.json")
 
+# Eliminar el archivo users.json en el directorio core si existe
+CORE_USERS_FILE = os.path.join(Path(__file__).resolve().parent, "users.json")
+if os.path.exists(CORE_USERS_FILE) and CORE_USERS_FILE != USERS_FILE:
+    try:
+        os.remove(CORE_USERS_FILE)
+        logger.warning(f"Removed duplicate users.json file at: {CORE_USERS_FILE}")
+    except Exception as e:
+        logger.error(f"Failed to remove duplicate users.json: {e}")
+
+# Log the actual path being used for users.json
+logger.info(f"Using users.json file at: {os.path.abspath(USERS_FILE)}")
+
 def load_users() -> Dict[str, Dict]:
     """Carga los usuarios desde users.json. Devuelve un diccionario vacío si el archivo no existe."""
     if not os.path.exists(USERS_FILE):

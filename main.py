@@ -13,12 +13,16 @@ import time
 from typing import Optional
 from dotenv import load_dotenv
 
+# Cargar variables de entorno primero para que estén disponibles para todos los módulos
+load_dotenv()
+
+# Importar el gestor de usuarios compartido desde el nuevo módulo
+from shared import user_manager
+
+# Importar routers después de configurar el gestor de usuarios compartido
 from api.users import router as users_router
 from api.auth import router as auth_router # Importar el nuevo router de autenticación
 from core import core # Para acceder al gestor de usuarios en /home
-
-# Cargar variables de entorno
-load_dotenv()
 
 # Configurar directorio base
 BASE_DIR = Path(__file__).resolve().parent
