@@ -26,7 +26,7 @@ from shared import user_manager as gestor_usuarios
 
 # Obtener credenciales de admin desde variables de entorno con valores por defecto
 ADMIN_USER_EMAIL = os.getenv("ADMIN_USER_EMAIL", "admin@scoreflex.com")
-ADMIN_USER_PASSWORD = os.getenv("ADMIN_USER_PASSWORD", "qwerty24") # Usar variables de entorno
+ADMIN_USER_PASSWORD = os.getenv("ADMIN_USER_PASSWORD", "qwe123") # Usar variables de entorno
 
 # Lista de tipos de usuario permitidos
 TIPOS_USUARIO_PERMITIDOS = ["Atleta", "Entrenador", "Delegado", "Juez", "Otro"]
